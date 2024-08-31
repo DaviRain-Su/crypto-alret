@@ -16,18 +16,18 @@ pub fn App() -> Element {
 
     rsx! {
         div {
-            class: "container mx-auto p-4",
-            h1 { class: "text-3xl font-bold mb-6 text-center text-blue-600", "Crypto Price Tracker" }
+            class: "min-h-screen bg-gray-100 p-8",
+            h1 { class: "text-4xl font-bold mb-8 text-center text-blue-600", "Crypto Price Tracker" }
             div {
-                class: "flex flex-col md:flex-row gap-4",
+                class: "grid grid-cols-1 lg:grid-cols-2 gap-8",
                 div {
-                    class: "w-full md:w-1/2 bg-white rounded-lg shadow-lg p-4",
-                    h2 { class: "text-xl font-semibold mb-4 text-gray-800", "Cryptocurrency List" }
+                    class: "bg-white rounded-lg shadow-lg p-6",
+                    h2 { class: "text-2xl font-semibold mb-6 text-gray-800", "Cryptocurrency List" }
                     CryptoList { crypto_list: crypto_list.read().clone() }
                 }
                 div {
-                    class: "w-full md:w-1/2 bg-white rounded-lg shadow-lg p-4",
-                    h2 { class: "text-xl font-semibold mb-4 text-gray-800", "Detailed Preview" }
+                    class: "bg-white rounded-lg shadow-lg p-6",
+                    h2 { class: "text-2xl font-semibold mb-6 text-gray-800", "Detailed Preview" }
                     Preview {}
                 }
             }
@@ -48,10 +48,10 @@ fn CryptoList(crypto_list: Vec<&'static str>) -> Element {
                     }
                 },
                 Some(Err(err)) => rsx! {
-                    div { class: "text-red-500", "An error occurred while fetching crypto prices: {err}" }
+                    div { class: "text-red-500 p-4 bg-red-100 rounded-md", "An error occurred while fetching crypto prices: {err}" }
                 },
                 None => rsx! {
-                    div { class: "text-gray-500", "Loading cryptocurrencies..." }
+                    div { class: "text-gray-500 p-4 bg-gray-100 rounded-md animate-pulse", "Loading cryptocurrencies..." }
                 },
             }
         }
@@ -86,15 +86,15 @@ fn CryptoListing(crypto: ReadOnlySignal<CryptoPrice>) -> Element {
 
     rsx! {
         div {
-            class: "bg-gray-100 rounded-md p-4 hover:bg-gray-200 transition-colors duration-200 cursor-pointer",
+            class: "bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-200 cursor-pointer",
             onmouseenter: move |_event| { resolve_crypto(full_crypto, preview_state, symbol.clone()) },
             div {
-                class: "flex justify-between items-center",
-                span { class: "text-lg font-semibold text-gray-800", "{symbol}" }
-                span { class: "text-lg font-bold text-green-600", "{formatted_price}" }
+                class: "flex justify-between items-center mb-2",
+                span { class: "text-xl font-semibold text-gray-800", "{symbol}" }
+                span { class: "text-xl font-bold text-green-600", "{formatted_price}" }
             }
             div {
-                class: "text-sm text-gray-600 mt-2",
+                class: "text-sm text-gray-600",
                 "Last updated: {time}"
             }
         }
@@ -112,18 +112,22 @@ fn Preview() -> Element {
     let preview_state = consume_context::<Signal<PreviewState>>();
 
     rsx! {
-        div { class: "bg-gray-100 rounded-md p-4 h-full",
+        div { class: "bg-gray-50 rounded-lg p-6 h-full",
             match preview_state() {
                 PreviewState::Unset => rsx! {
-                    div { class: "text-gray-600 text-center", "Hover over a cryptocurrency to see more details" }
+                    div { class: "text-gray-600 text-center p-8 bg-gray-100 rounded-md",
+                        "Hover over a cryptocurrency to see more details"
+                    }
                 },
                 PreviewState::Loading => rsx! {
-                    div { class: "text-blue-600 text-center", "Loading detailed information..." }
+                    div { class: "text-blue-600 text-center p-8 bg-blue-100 rounded-md animate-pulse",
+                        "Loading detailed information..."
+                    }
                 },
                 PreviewState::Loaded(crypto) => {
                     rsx! {
-                        div { class: "space-y-2",
-                            h3 { class: "text-2xl font-bold text-gray-800 mb-4", "{crypto.symbol} Details" }
+                        div { class: "space-y-4",
+                            h3 { class: "text-2xl font-bold text-gray-800 mb-6", "{crypto.symbol} Details" }
                             PreviewItem { label: "Price", value: format!("${}", crypto.price) }
                             PreviewItem { label: "24h High", value: format!("${}", crypto.high_24h) }
                             PreviewItem { label: "24h Low", value: format!("${}", crypto.low_24h) }
@@ -140,8 +144,8 @@ fn Preview() -> Element {
 #[component]
 fn PreviewItem(label: &'static str, value: String) -> Element {
     rsx! {
-        div { class: "flex justify-between items-center",
-            span { class: "text-gray-600", "{label}:" }
+        div { class: "flex justify-between items-center p-3 bg-white rounded-md shadow-sm",
+            span { class: "text-gray-600 font-medium", "{label}" }
             span { class: "font-semibold text-gray-800", "{value}" }
         }
     }
